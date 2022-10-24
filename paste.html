@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>paste</title>
+    <style>
+        body { margin: 0px; }
+
+        #app { 
+            outline: none;
+            min-height: 100vh;
+         }
+    </style>
+</head>
+<body>
+    <div id="app" contenteditable></div>
+</body>
+<script>
+    let task
+    let body = document.body
+    let app = document.getElementById("app")
+    let key = localStorage._key
+    if(!key) {
+        key = prompt("please fill in your name") || 'default'
+        localStorage._key = key
+    }
+    let path = "https://api.yogh.fun/paste/" + key
+    fetch(path).then(res => res.text().then(text => app.innerHTML = text))
+    body.oninput = () => {
+        clearTimeout(task)
+        task = setTimeout(() => fetch(path, {
+            headers: {'content-type': 'application/json'},
+            method: 'put', 
+            body: JSON.stringify({data: app.innerHTML})
+        }), 1000)
+    }
+</script>
+</html>
